@@ -1,0 +1,117 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 250 20% 98%;
+    --foreground: 222 47% 11%;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  body {
+    color: #061530;
+    background-color: #ffffff;
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+  }
+
+  ::selection {
+    background-color: #43b02a;
+    color: #ffffff;
+  }
+}
+
+@layer components {
+  /* Premium Primary Deep Navy Button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center font-bold text-sm px-6 py-3.5 rounded-xl bg-navy-950 text-white hover:bg-navy-900 active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-lg hover:shadow-navy-950/20 border border-navy-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+  }
+
+  /* Vibrant Official Fresh Green Button */
+  .btn-accent {
+    @apply inline-flex items-center justify-center font-bold text-sm px-6 py-3.5 rounded-xl bg-green-500 text-white hover:bg-green-600 active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-xl hover:shadow-green-600/30 border border-green-500 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2;
+  }
+
+  /* Sophisticated Secondary White Button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center font-bold text-sm px-6 py-3.5 rounded-xl bg-white text-navy-950 border border-slate-200/90 hover:bg-slate-50 hover:border-green-500/50 active:scale-[0.98] transition-all duration-200 shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2;
+  }
+
+  /* Outline Fresh Green Button */
+  .btn-outline-green {
+    @apply inline-flex items-center justify-center font-bold text-sm px-6 py-3.5 rounded-xl bg-green-500/10 text-green-300 border border-green-400/50 hover:bg-green-500/20 hover:border-green-300 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-400;
+  }
+
+  /* Clinical Pill Badges */
+  .badge-green {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-800 border border-green-200;
+  }
+
+  .badge-teal {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-800 border border-green-200;
+  }
+
+  .badge-navy {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-navy-50 text-navy-900 border border-navy-200;
+  }
+
+  .badge-urgent {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-50 text-amber-900 border border-amber-300 animate-pulse;
+  }
+
+  /* Editorial Card Elevations */
+  .card-elevated {
+    @apply bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm hover:shadow-xl hover:border-green-500/50 transition-all duration-300;
+  }
+
+  /* Glass Card on Dark Navy */
+  .glass-card-navy {
+    @apply bg-navy-900/85 backdrop-blur-xl border border-navy-700/60 rounded-2xl p-6 shadow-2xl;
+  }
+}
+
+/* Subtle background clinical dot grids with green accents */
+.bg-clinical-grid {
+  background-image: radial-gradient(rgba(67, 176, 42, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-clinical-grid-dark {
+  background-image: radial-gradient(rgba(67, 176, 42, 0.18) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Smooth Interactive Micro-animations */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+/* Custom refined scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #43b02a;
+}
