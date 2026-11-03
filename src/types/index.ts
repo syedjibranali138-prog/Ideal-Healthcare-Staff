@@ -31,6 +31,7 @@ export interface Job {
   benefits: string[];
   status: JobStatus;
   isUrgent: boolean;
+  isPersisted?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -59,6 +60,7 @@ export interface Application {
   consentGiven: boolean;
   status: ApplicationStatus;
   adminNotes?: string;
+  isPersisted?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -86,6 +88,7 @@ export interface FacilityInquiry {
   details?: string;
   status: FacilityInquiryStatus;
   adminNotes?: string;
+  isPersisted?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -98,6 +101,7 @@ export interface JobAlert {
   employmentType?: string;
   isActive: boolean;
   unsubscribeToken: string;
+  isPersisted?: boolean;
   createdAt: string;
 }
 

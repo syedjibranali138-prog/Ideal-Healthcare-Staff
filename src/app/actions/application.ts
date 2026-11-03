@@ -9,6 +9,7 @@ export interface ApplicationSubmitResult {
   message?: string;
   applicationId?: string;
   error?: string;
+  isPersisted?: boolean;
 }
 
 const ALLOWED_MIME_TYPES = [
@@ -134,6 +135,7 @@ export async function handleApplicationSubmit(
     return {
       success: true,
       applicationId: savedApp.id,
+      isPersisted: Boolean(savedApp.isPersisted),
       message: "Application submitted successfully. A healthcare recruitment specialist will review your credentials promptly.",
     };
   } catch (err: any) {

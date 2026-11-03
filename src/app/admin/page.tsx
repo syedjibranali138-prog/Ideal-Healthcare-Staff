@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { checkAdminAuth } from "@/app/actions/admin";
-import { getAllJobsAdmin, getApplications, getFacilityInquiries } from "@/lib/db";
+import { getAllJobsAdmin, getApplications, getFacilityInquiries, getDataLayerStatus } from "@/lib/db";
 import AdminDashboardClient from "./AdminDashboardClient";
 import AdminLoginForm from "./AdminLoginForm";
 
@@ -21,10 +21,11 @@ export default async function AdminPage() {
     return <AdminLoginForm />;
   }
 
-  const [jobs, applications, inquiries] = await Promise.all([
+  const [jobs, applications, inquiries, dataLayerStatus] = await Promise.all([
     getAllJobsAdmin(),
     getApplications(),
     getFacilityInquiries(),
+    getDataLayerStatus(),
   ]);
 
   return (
@@ -32,6 +33,7 @@ export default async function AdminPage() {
       initialJobs={jobs}
       initialApplications={applications}
       initialInquiries={inquiries}
+      dataLayerStatus={dataLayerStatus}
     />
   );
 }

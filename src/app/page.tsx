@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getJobs } from "@/lib/db";
 import JobCard from "@/components/JobCard";
+import HealthcareNetworkCanvas from "@/components/HealthcareNetworkCanvas";
 import { 
   ArrowRight, 
   Search, 
@@ -30,227 +31,184 @@ export default async function HomePage() {
   const featuredJobs = jobs.slice(0, 4);
 
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-[#FBFBFA] dark:bg-[#070E1A] text-[#061530] dark:text-[#E2E8F0] transition-colors duration-200">
       
       {/* ==================================================================== */}
-      {/* 1. HERO SECTION: OFFICIAL NAVY & FRESH GREEN BRANDING */}
+      {/* 1. DISTINCTIVE FULL-WIDTH PHOTOGRAPHIC HEALTHCARE HERO */}
       {/* ==================================================================== */}
-      <section className="relative bg-navy-950 text-white pt-12 pb-24 lg:pt-16 lg:pb-32 border-b border-navy-900 overflow-hidden">
-        {/* Ambient fresh green & navy glow accents matching logo */}
-        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-green-500/10 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-navy-600/25 rounded-full blur-[140px] pointer-events-none" />
-        {/* Subtle dot matrix pattern */}
-        <div className="absolute inset-0 bg-clinical-grid-dark opacity-35 pointer-events-none" />
+      <section className="relative min-h-[85vh] lg:min-h-[88vh] flex items-center justify-center text-white pt-14 pb-16 lg:pt-18 lg:pb-24 border-b border-navy-900 overflow-hidden bg-[#020712]">
+        
+        {/* Full-Bleed True Photographic Background - Edge to Edge */}
+        <div className="absolute inset-0 z-0 select-none">
+          <Image
+            src="/images/hero-clinician.jpg"
+            alt="Healthcare clinical specialist caring in clinical environment"
+            fill
+            priority
+            quality={92}
+            sizes="100vw"
+            className="object-cover object-[center_24%] filter brightness-[0.82] contrast-[1.08] scale-100 animate-hero-bg"
+          />
+          {/* Art-Directed Cinematic Scrim & Contrast Gradients for Crystal-Clear Text Readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#020712]/92 via-[#020712]/78 to-[#020712]/60" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#020712] via-transparent to-[#020712]/70" />
+          <div className="absolute inset-0 bg-radial-[circle_at_center,_transparent_20%,_#020712_90%] opacity-60" />
+          <div className="absolute inset-0 bg-clinical-grid-dark opacity-15 pointer-events-none" />
+        </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* Dynamic Constellation Network Canvas */}
+        <HealthcareNetworkCanvas className="opacity-45" nodeCount={34} />
+
+        {/* Ambient Subtle Clinical Glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[350px] bg-green-500/15 rounded-full blur-[150px] pointer-events-none" />
+
+        {/* Overlaid Editorial Content Container */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full text-center">
           
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-            
-            {/* Left Content Column */}
-            <div className="lg:col-span-7 space-y-7">
+          {/* Institutional Quality Pill with entrance animation */}
+          <div className="animate-hero-badge inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-navy-950/90 backdrop-blur-md border border-green-400/40 text-green-300 text-xs font-bold tracking-wide shadow-2xl mb-5">
+            <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
+            <span>{COMPANY_INFO.tagline}</span>
+            <span className="text-slate-600 hidden sm:inline">•</span>
+            <span className="text-slate-200 hidden sm:inline">Primary-Source Verified Placements</span>
+            <span className="text-slate-600 hidden md:inline">•</span>
+            <span className="text-slate-200 hidden md:inline">Los Angeles HQ</span>
+          </div>
+
+          {/* Bold Editorial Headline directly over photograph with entrance animation */}
+          <div className="space-y-4 max-w-4xl mx-auto">
+            <h1 className="animate-hero-title text-3xl sm:text-5xl lg:text-6xl xl:text-[68px] font-black tracking-tight leading-[1.08] font-display text-white drop-shadow-md">
+              Where Dedication Meets Opportunity. <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-green-300 to-emerald-100">
+                Connecting Clinical Excellence.
+              </span>
+            </h1>
+
+            <p className="animate-hero-sub text-base sm:text-lg lg:text-xl text-slate-100 leading-relaxed max-w-2xl mx-auto font-normal drop-shadow">
+              Ideal Healthcare Staffing bridges the gap between premier health systems and exceptional travel nurses, allied health specialists, and clinical professionals nationwide.
+            </p>
+          </div>
+
+          {/* Dual Primary Call-to-Actions with entrance animation */}
+          <div className="animate-hero-ctas flex flex-col sm:flex-row items-center justify-center gap-4 pt-7 max-w-md sm:max-w-none mx-auto">
+            <Link
+              href="/jobs"
+              className="btn-accent py-4 px-8 sm:px-9 text-base font-bold flex items-center justify-center gap-2.5 shadow-2xl shadow-green-950/70 group hover-lift w-full sm:w-auto"
+            >
+              <Briefcase className="w-5 h-5" />
+              <span>Find Healthcare Jobs</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
+            </Link>
+
+            <Link
+              href="/facilities#inquiry-form"
+              className="inline-flex items-center justify-center gap-2 py-4 px-8 sm:px-9 rounded-xl text-base font-bold text-white bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/25 hover:border-green-400/50 transition-all shadow-xl group hover-lift w-full sm:w-auto"
+            >
+              <Building2 className="w-5 h-5 text-green-400" />
+              <span>Request Staffing</span>
+              <ChevronRight className="w-4 h-4 text-slate-200 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+
+          {/* Fast Recruitment Search Console with entrance animation */}
+          <div className="animate-hero-search pt-8 max-w-4xl mx-auto text-left">
+            <div className="bg-[#030914]/90 backdrop-blur-xl p-5 sm:p-6 rounded-2xl border border-white/15 shadow-2xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 px-1">
+                <span className="text-xs font-black text-green-300 uppercase tracking-wider flex items-center gap-2">
+                  <Search className="w-4 h-4 text-green-400" />
+                  <span>Search Hospital & Clinical Openings</span>
+                </span>
+                <span className="text-[11px] text-slate-300 font-medium">
+                  Direct hospital orders • Weekly competitive pay
+                </span>
+              </div>
               
-              <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-navy-900/90 border border-green-500/40 text-green-300 text-xs font-bold tracking-wide shadow-lg animate-fade-in">
-                <span className="w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse" />
-                <span>{COMPANY_INFO.tagline}</span>
-              </div>
-
-              <div className="space-y-3">
-                <h1 className="text-4xl sm:text-5xl lg:text-[62px] font-black tracking-tight leading-[1.08] font-display text-white">
-                  The Right Professionals. <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-green-300 to-white">
-                    The Right Place. The Right Time.™
-                  </span>
-                </h1>
-
-                <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl font-normal pt-1">
-                  Ideal Healthcare Staffing connects dedicated travel nurses, allied health clinicians, and specialized providers with leading acute care hospitals and health systems nationwide.
-                </p>
-              </div>
-
-              {/* Direct Dual CTAs */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-                <Link
-                  href="/jobs"
-                  className="btn-accent py-4 px-8 text-base font-bold flex items-center justify-center gap-2.5 shadow-xl shadow-green-950/40 group hover-lift"
-                >
-                  <Briefcase className="w-5 h-5" />
-                  <span>Find Travel Jobs</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
-                </Link>
-
-                <Link
-                  href="/facilities#inquiry-form"
-                  className="inline-flex items-center justify-center gap-2 py-4 px-8 rounded-xl text-base font-bold text-white bg-navy-900 hover:bg-navy-800 border border-navy-700/80 transition-all shadow-md group hover-lift"
-                >
-                  <Building2 className="w-5 h-5 text-green-400" />
-                  <span>Request Staffing Coverage</span>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-
-              {/* Embedded Fast Job Search Console */}
-              <div className="pt-4">
-                <div className="bg-navy-900/90 backdrop-blur-md p-5 rounded-2xl border border-navy-700/80 shadow-2xl">
-                  <div className="flex items-center justify-between mb-3 px-1">
-                    <span className="text-xs font-extrabold text-green-300 uppercase tracking-wider flex items-center gap-2">
-                      <Search className="w-3.5 h-3.5 text-green-400" />
-                      <span>Search Clinical Positions</span>
-                    </span>
-                    <span className="text-[11px] text-slate-400 hidden sm:inline">
-                      Direct hospital orders • Weekly pay packages
-                    </span>
-                  </div>
-                  
-                  <form action="/jobs" method="GET" className="grid grid-cols-1 sm:grid-cols-12 gap-3">
-                    <div className="sm:col-span-4">
-                      <input
-                        type="text"
-                        name="search"
-                        placeholder="Role or specialty (e.g. ICU RN)"
-                        className="w-full px-3.5 py-3 text-xs rounded-xl border border-navy-700 bg-navy-950/80 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-400 font-medium"
-                      />
-                    </div>
-
-                    <div className="sm:col-span-3">
-                      <select
-                        name="specialty"
-                        defaultValue="all"
-                        className="w-full px-3.5 py-3 text-xs rounded-xl border border-navy-700 bg-navy-950/80 text-white focus:outline-none focus:ring-2 focus:ring-green-400 font-medium"
-                      >
-                        <option value="all" className="bg-navy-950 text-white">All Specialties</option>
-                        {SPECIALTIES.slice(0, 10).map((s) => (
-                          <option key={s} value={s} className="bg-navy-950 text-white">{s}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="sm:col-span-2">
-                      <select
-                        name="state"
-                        defaultValue="all"
-                        className="w-full px-3.5 py-3 text-xs rounded-xl border border-navy-700 bg-navy-950/80 text-white focus:outline-none focus:ring-2 focus:ring-green-400 font-medium"
-                      >
-                        <option value="all" className="bg-navy-950 text-white">All States</option>
-                        {US_STATES.slice(0, 10).map((st) => (
-                          <option key={st.code} value={st.code} className="bg-navy-950 text-white">
-                            {st.name} ({st.code})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="sm:col-span-3">
-                      <button
-                        type="submit"
-                        className="w-full btn-accent py-3 text-xs font-black flex items-center justify-center gap-1.5"
-                      >
-                        <Search className="w-3.5 h-3.5 text-white" />
-                        <span>Search Jobs</span>
-                      </button>
-                    </div>
-                  </form>
-
-                  {/* Quick Filters */}
-                  <div className="mt-3.5 pt-3 border-t border-navy-800/80 flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
-                    <span className="font-bold text-slate-300">Popular:</span>
-                    <Link href="/jobs?search=ICU" className="text-green-300 hover:text-white bg-navy-950/60 px-2.5 py-0.5 rounded border border-navy-800 transition-colors">
-                      ICU RN
-                    </Link>
-                    <Link href="/jobs?search=Emergency" className="text-green-300 hover:text-white bg-navy-950/60 px-2.5 py-0.5 rounded border border-navy-800 transition-colors">
-                      ER Registered Nurse
-                    </Link>
-                    <Link href="/jobs?search=OR" className="text-green-300 hover:text-white bg-navy-950/60 px-2.5 py-0.5 rounded border border-navy-800 transition-colors">
-                      Operating Room
-                    </Link>
-                    <Link href="/jobs?search=Telemetry" className="text-green-300 hover:text-white bg-navy-950/60 px-2.5 py-0.5 rounded border border-navy-800 transition-colors">
-                      Telemetry
-                    </Link>
-                    <Link href="/jobs?department=Allied+Health" className="text-green-300 hover:text-white bg-navy-950/60 px-2.5 py-0.5 rounded border border-navy-800 transition-colors">
-                      Allied Health
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
-              {/* Verified Contact Details Bar */}
-              <div className="pt-2 flex flex-wrap items-center gap-6 text-xs text-slate-300">
-                <a href={COMPANY_INFO.phoneHref} className="flex items-center gap-2 hover:text-green-300 transition-colors">
-                  <PhoneCall className="w-4 h-4 text-green-400 shrink-0" />
-                  <span className="font-bold text-white">{COMPANY_INFO.phone}</span>
-                </a>
-                <div className="flex items-center gap-2">
-                  <Printer className="w-4 h-4 text-green-400 shrink-0" />
-                  <span>Fax: {COMPANY_INFO.fax}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-green-400 shrink-0" />
-                  <span>Los Angeles, CA</span>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Right Visual Clinical Showcase */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md lg:max-w-none">
-                
-                {/* Main Clinical Image Frame */}
-                <div className="relative rounded-3xl overflow-hidden border-2 border-navy-700/80 shadow-2xl bg-navy-900 aspect-[4/5] group">
-                  <Image
-                    src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80"
-                    alt="Clinical nurse manager in modern healthcare hospital"
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 550px"
-                    className="object-cover object-center group-hover:scale-105 transition-transform duration-700"
+              <form action="/jobs" method="GET" className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                <div className="sm:col-span-5">
+                  <input
+                    type="text"
+                    name="search"
+                    placeholder="Role or specialty (e.g. ICU RN, Med Surg, ER)"
+                    className="w-full px-4 py-3 text-xs sm:text-sm rounded-xl border border-navy-700 bg-navy-950/90 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-400 font-medium"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/30 to-transparent" />
-                  
-                  {/* Bottom Image Overlay Text */}
-                  <div className="absolute bottom-6 left-6 right-6 text-white">
-                    <span className="badge-green text-[11px] mb-2 inline-block bg-green-500/20 text-green-300 border-green-400/40">
-                      Ideal Healthcare Network
-                    </span>
-                    <p className="text-xl font-bold leading-tight font-display">
-                      Empowering dedicated clinicians. Supporting hospital care teams.
-                    </p>
-                    <p className="text-xs text-slate-300 mt-1.5">
-                      Direct deposit weekly payroll • Comprehensive day-one health benefits
-                    </p>
-                  </div>
                 </div>
 
-                {/* Floating Metric Pill 1 (Top Left) */}
-                <div className="absolute -top-5 -left-4 sm:-left-6 bg-white text-navy-950 p-4 rounded-2xl border border-slate-200/90 shadow-2xl hidden sm:block animate-float">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-green-50 text-green-700 flex items-center justify-center">
-                      <Sparkles className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] font-black uppercase tracking-wider text-slate-400">Weekly Compensation</div>
-                      <div className="text-base font-black text-navy-950 font-sans">$2,450 – $3,450/wk</div>
-                    </div>
-                  </div>
+                <div className="sm:col-span-3">
+                  <select
+                    name="specialty"
+                    defaultValue="all"
+                    className="w-full px-3.5 py-3 text-xs sm:text-sm rounded-xl border border-navy-700 bg-navy-950/90 text-white focus:outline-none focus:ring-2 focus:ring-green-400 font-medium"
+                  >
+                    <option value="all" className="bg-navy-950 text-white">All Specialties</option>
+                    {SPECIALTIES.slice(0, 10).map((s) => (
+                      <option key={s} value={s} className="bg-navy-950 text-white">{s}</option>
+                    ))}
+                  </select>
                 </div>
 
-                {/* Floating Metric Pill 2 (Bottom Right) */}
-                <div className="absolute -bottom-5 -right-4 sm:-right-6 bg-navy-900/95 backdrop-blur-md text-white p-4 rounded-2xl border border-green-500/40 shadow-2xl hidden sm:block">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-green-500/20 text-green-400 flex items-center justify-center border border-green-400/30">
-                      <Building2 className="w-5 h-5 text-green-300" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-green-300">Hospital Staffing Support</div>
-                      <a href={COMPANY_INFO.phoneHref} className="text-sm font-bold text-white font-sans hover:text-green-300 transition-colors">
-                        {COMPANY_INFO.phone}
-                      </a>
-                    </div>
-                  </div>
+                <div className="sm:col-span-2">
+                  <select
+                    name="state"
+                    defaultValue="all"
+                    className="w-full px-3.5 py-3 text-xs sm:text-sm rounded-xl border border-navy-700 bg-navy-950/90 text-white focus:outline-none focus:ring-2 focus:ring-green-400 font-medium"
+                  >
+                    <option value="all" className="bg-navy-950 text-white">All States</option>
+                    {US_STATES.slice(0, 10).map((st) => (
+                      <option key={st.code} value={st.code} className="bg-navy-950 text-white">
+                        {st.name} ({st.code})
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
+                <div className="sm:col-span-2">
+                  <button
+                    type="submit"
+                    className="w-full btn-accent py-3 text-xs sm:text-sm font-black flex items-center justify-center gap-1.5 shadow-lg"
+                  >
+                    <Search className="w-4 h-4 text-white" />
+                    <span>Search</span>
+                  </button>
+                </div>
+              </form>
+
+              {/* Popular Searches Quick Chips */}
+              <div className="mt-3.5 pt-3 border-t border-navy-800/80 flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
+                <span className="font-bold text-white">Trending:</span>
+                <Link href="/jobs?search=ICU" className="text-green-300 hover:text-white bg-navy-950/80 px-2.5 py-1 rounded-lg border border-navy-800 hover:border-green-500/50 transition-colors">
+                  ICU Registered Nurse
+                </Link>
+                <Link href="/jobs?search=Emergency" className="text-green-300 hover:text-white bg-navy-950/80 px-2.5 py-1 rounded-lg border border-navy-800 hover:border-green-500/50 transition-colors">
+                  Emergency Room (ER)
+                </Link>
+                <Link href="/jobs?search=OR" className="text-green-300 hover:text-white bg-navy-950/80 px-2.5 py-1 rounded-lg border border-navy-800 hover:border-green-500/50 transition-colors">
+                  Operating Room (OR)
+                </Link>
+                <Link href="/jobs?department=Allied+Health" className="text-green-300 hover:text-white bg-navy-950/80 px-2.5 py-1 rounded-lg border border-navy-800 hover:border-green-500/50 transition-colors">
+                  Allied Health & Therapy
+                </Link>
               </div>
             </div>
+          </div>
 
+          {/* Verified Contact & Compliance Trust Strip */}
+          <div className="pt-7 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-xs text-slate-300">
+            <a href={COMPANY_INFO.phoneHref} className="flex items-center gap-2 hover:text-green-300 transition-colors">
+              <PhoneCall className="w-4 h-4 text-green-400 shrink-0" />
+              <span className="font-bold text-white">{COMPANY_INFO.phone}</span>
+            </a>
+            <div className="flex items-center gap-2">
+              <Printer className="w-4 h-4 text-green-400 shrink-0" />
+              <span>Fax: {COMPANY_INFO.fax}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-green-400 shrink-0" />
+              <span>Los Angeles, CA 90035</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-green-400 shrink-0" />
+              <span>Joint Commission & OSHA Compliant Standards</span>
+            </div>
           </div>
 
         </div>
@@ -686,66 +644,42 @@ export default async function HomePage() {
       </section>
 
       {/* ==================================================================== */}
-      {/* 7. OFFICIAL HEADQUARTERS & CONTACT BANNER */}
+      {/* 7. INSTITUTIONAL CREDENTIALING & CLINICAL GOVERNANCE */}
       {/* ==================================================================== */}
-      <section className="py-20 lg:py-24 bg-navy-950 text-white relative overflow-hidden">
-        <div className="absolute inset-0 bg-clinical-grid-dark opacity-20 pointer-events-none" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-8">
-          
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-navy-900 border border-green-500/40 text-green-300 text-xs font-bold">
-            <MapPin className="w-4 h-4 text-green-400" />
-            <span>Official Los Angeles Headquarters</span>
+      <section className="py-16 lg:py-20 bg-slate-50 dark:bg-dark-surface/60 border-b border-slate-200/90 dark:border-dark-border transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white dark:bg-dark-surface border border-slate-200/90 dark:border-dark-border rounded-3xl p-8 sm:p-12 shadow-sm">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-8 space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800/60 text-green-700 dark:text-green-300 text-xs font-bold">
+                  <ShieldCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span>Clinical Governance & Regulatory Alignment</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-navy-950 dark:text-white tracking-tight font-display">
+                  Primary-source verified clinicians. Rigorous healthcare standards.
+                </h2>
+                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl">
+                  Every clinician represented by Ideal Healthcare Staffing undergoes comprehensive background checks, direct state licensure validation, specialty skills verification, and healthcare compliance clearance before assignment presentation.
+                </p>
+              </div>
+              <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
+                <Link
+                  href="/jobs"
+                  className="btn-accent py-3.5 px-6 text-xs font-bold flex items-center justify-center gap-2 shadow-md"
+                >
+                  <Briefcase className="w-4 h-4" />
+                  <span>Browse Current Contracts</span>
+                </Link>
+                <Link
+                  href="/facilities#inquiry-form"
+                  className="btn-secondary py-3.5 px-6 text-xs font-bold flex items-center justify-center gap-2"
+                >
+                  <Building2 className="w-4 h-4 text-navy-900 dark:text-sky-400" />
+                  <span>Staffing Coverage Inquiry</span>
+                </Link>
+              </div>
+            </div>
           </div>
-
-          <div className="space-y-3">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight font-display text-white">
-              {COMPANY_INFO.name}
-            </h2>
-            <p className="text-green-400 text-lg sm:text-xl font-bold font-display">
-              {COMPANY_INFO.tagline}
-            </p>
-            <p className="text-slate-300 text-sm max-w-xl mx-auto">
-              {COMPANY_INFO.address}
-            </p>
-          </div>
-
-          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-md mx-auto">
-            <a
-              href={COMPANY_INFO.phoneHref}
-              className="btn-accent w-full sm:w-auto py-4 px-8 text-base font-bold flex items-center justify-center gap-2 shadow-xl shadow-green-950/50"
-            >
-              <PhoneCall className="w-5 h-5" />
-              <span>Call {COMPANY_INFO.phone}</span>
-            </a>
-
-            <Link
-              href="/facilities#inquiry-form"
-              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto py-4 px-8 rounded-xl text-base font-bold text-white bg-navy-900 hover:bg-navy-800 border border-navy-700 transition-all shadow-md"
-            >
-              <Building2 className="w-5 h-5 text-green-400" />
-              <span>Submit Inquiry</span>
-            </Link>
-          </div>
-
-          <div className="pt-8 border-t border-navy-800/80 flex flex-wrap items-center justify-center gap-8 text-xs text-slate-400">
-            <span className="flex items-center gap-1.5">
-              <Printer className="w-4 h-4 text-green-400" />
-              Fax: {COMPANY_INFO.fax}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <MapPin className="w-4 h-4 text-green-400" />
-              Los Angeles, CA 90035
-            </span>
-            <a 
-              href={COMPANY_INFO.website} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-green-400 hover:text-green-300 font-medium"
-            >
-              idealhealthcarestaff.com
-            </a>
-          </div>
-
         </div>
       </section>
 

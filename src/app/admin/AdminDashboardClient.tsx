@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Job, Application, FacilityInquiry, ApplicationStatus, FacilityInquiryStatus } from "@/types";
+import { DataLayerStatus } from "@/lib/db";
 import { 
   adminCreateJob, 
   adminSetJobStatus, 
@@ -37,12 +38,14 @@ interface AdminDashboardClientProps {
   initialJobs: Job[];
   initialApplications: Application[];
   initialInquiries: FacilityInquiry[];
+  dataLayerStatus?: DataLayerStatus;
 }
 
 export default function AdminDashboardClient({
   initialJobs,
   initialApplications,
   initialInquiries,
+  dataLayerStatus,
 }: AdminDashboardClientProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "jobs" | "applications" | "facilities" | "import">("overview");
   const [jobs, setJobs] = useState<Job[]>(initialJobs);
@@ -93,7 +96,11 @@ export default function AdminDashboardClient({
     } else if (res.job) {
       setJobs([res.job, ...jobs]);
       setCreateJobModalOpen(false);
-      showNotification(`Job position "${res.job.title}" created successfully.`);
+      if (res.isPersisted) {
+        showNotification(`Job position "${res.job.title}" saved to PostgreSQL database.`);
+      } else {
+        showNotification(`Job position "${res.job.title}" created in fallback store (Supabase unconfigured).`);
+      }
     }
   };
 
@@ -251,7 +258,7 @@ export default function AdminDashboardClient({
   });
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen">
+    <div className="bg-[#F8FAFC] dark:bg-[#070E1A] min-h-screen text-slate-900 dark:text-slate-100 transition-colors">
       {/* Top Admin Header */}
       <div className="bg-navy-950 text-white border-b border-navy-900 px-4 sm:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -302,15 +309,15 @@ export default function AdminDashboardClient({
       )}
 
       {/* Main Admin Navigation Tabs */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-white dark:bg-dark-surface border-b border-slate-200 dark:border-dark-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-8">
           <div className="flex space-x-8 overflow-x-auto text-xs font-semibold">
             <button
               onClick={() => setActiveTab("overview")}
               className={`py-4 border-b-2 flex items-center gap-2 whitespace-nowrap transition-colors ${
                 activeTab === "overview"
-                  ? "border-teal-600 text-teal-700"
-                  : "border-transparent text-slate-500 hover:text-navy-950"
+                  ? "border-green-600 dark:border-green-400 text-green-700 dark:text-green-400"
+                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-navy-950 dark:hover:text-white"
               }`}
             >
               <LayoutDashboard className="w-4 h-4" />
@@ -321,8 +328,8 @@ export default function AdminDashboardClient({
               onClick={() => setActiveTab("jobs")}
               className={`py-4 border-b-2 flex items-center gap-2 whitespace-nowrap transition-colors ${
                 activeTab === "jobs"
-                  ? "border-teal-600 text-teal-700"
-                  : "border-transparent text-slate-500 hover:text-navy-950"
+                  ? "border-green-600 dark:border-green-400 text-green-700 dark:text-green-400"
+                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-navy-950 dark:hover:text-white"
               }`}
             >
               <Briefcase className="w-4 h-4" />
@@ -333,8 +340,8 @@ export default function AdminDashboardClient({
               onClick={() => setActiveTab("applications")}
               className={`py-4 border-b-2 flex items-center gap-2 whitespace-nowrap transition-colors ${
                 activeTab === "applications"
-                  ? "border-teal-600 text-teal-700"
-                  : "border-transparent text-slate-500 hover:text-navy-950"
+                  ? "border-green-600 dark:border-green-400 text-green-700 dark:text-green-400"
+                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-navy-950 dark:hover:text-white"
               }`}
             >
               <Users className="w-4 h-4" />
@@ -345,8 +352,8 @@ export default function AdminDashboardClient({
               onClick={() => setActiveTab("facilities")}
               className={`py-4 border-b-2 flex items-center gap-2 whitespace-nowrap transition-colors ${
                 activeTab === "facilities"
-                  ? "border-teal-600 text-teal-700"
-                  : "border-transparent text-slate-500 hover:text-navy-950"
+                  ? "border-green-600 dark:border-green-400 text-green-700 dark:text-green-400"
+                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-navy-950 dark:hover:text-white"
               }`}
             >
               <Building2 className="w-4 h-4" />
@@ -357,8 +364,8 @@ export default function AdminDashboardClient({
               onClick={() => setActiveTab("import")}
               className={`py-4 border-b-2 flex items-center gap-2 whitespace-nowrap transition-colors ${
                 activeTab === "import"
-                  ? "border-teal-600 text-teal-700"
-                  : "border-transparent text-slate-500 hover:text-navy-950"
+                  ? "border-green-600 dark:border-green-400 text-green-700 dark:text-green-400"
+                  : "border-transparent text-slate-500 dark:text-slate-400 hover:text-navy-950 dark:hover:text-white"
               }`}
             >
               <Upload className="w-4 h-4" />
@@ -418,13 +425,37 @@ export default function AdminDashboardClient({
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   Data Layer Status
                 </span>
-                <div className="mt-2 text-sm font-bold text-navy-950 flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <span>Production Ready</span>
-                </div>
-                <div className="mt-1 text-xs text-slate-400">
-                  PostgreSQL / Supabase Schema Active
-                </div>
+                {dataLayerStatus?.mode === "database" ? (
+                  <>
+                    <div className="mt-2 text-sm font-bold text-navy-950 flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                      <span>Supabase Connected</span>
+                    </div>
+                    <div className="mt-1 text-xs text-slate-400">
+                      PostgreSQL & Private Storage Active
+                    </div>
+                  </>
+                ) : dataLayerStatus?.mode === "error" ? (
+                  <>
+                    <div className="mt-2 text-sm font-bold text-rose-700 flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse" />
+                      <span>Database Error</span>
+                    </div>
+                    <div className="mt-1 text-xs text-slate-400 truncate" title={dataLayerStatus.details}>
+                      {dataLayerStatus.details || "Connection check failed • Using fallback"}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="mt-2 text-sm font-bold text-amber-700 flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+                      <span>In-Memory Fallback</span>
+                    </div>
+                    <div className="mt-1 text-xs text-slate-400">
+                      Supabase unconfigured • Data transient in RAM
+                    </div>
+                  </>
+                )}
               </div>
 
             </div>
@@ -911,7 +942,12 @@ export default function AdminDashboardClient({
               {csvReport && (
                 <div className="p-4 rounded-lg bg-teal-50 border border-teal-200 text-xs text-teal-900 space-y-2">
                   <p className="font-bold">Import Summary:</p>
-                  <p>Successfully Created: {csvReport.imported} jobs</p>
+                  <p>
+                    Successfully Created: {csvReport.imported} jobs{" "}
+                    <span className="text-[11px] font-semibold text-slate-600">
+                      ({dataLayerStatus?.mode === "database" ? "persisted to PostgreSQL" : "stored in local fallback dataset"})
+                    </span>
+                  </p>
                   <p>Skipped / Failed: {csvReport.failed} rows</p>
                   {csvReport.errors.length > 0 && (
                     <ul className="list-disc pl-5 text-rose-700 text-[11px] space-y-1">

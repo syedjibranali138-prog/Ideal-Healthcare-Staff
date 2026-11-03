@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -49,17 +50,39 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Anti-flash inline script to prevent theme flickering on page load
+const themeInitScript = `
+  (function() {
+    try {
+      var stored = localStorage.getItem('ihs-theme-preference');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (stored === 'dark' || (!stored && prefersDark) || (stored === 'system' && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {}
+  })();
+`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable}`}>
-      <body className="min-h-screen flex flex-col font-sans bg-[#FBFBFA] text-[#0B1B3D] antialiased">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+    <html lang="en" suppressHydrationWarning className={`${inter.variable}`}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
+      </head>
+      <body className="min-h-screen flex flex-col font-sans bg-[#FBFBFA] dark:bg-[#070E1A] text-[#0B1B3D] dark:text-[#E2E8F0] antialiased transition-colors duration-200">
+        <ThemeProvider>
+          <Navbar />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

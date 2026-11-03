@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -53,6 +54,14 @@ export default {
           100: "#f6f6f4",
           200: "#ededeb",
           300: "#dededb",
+        },
+        // Dedicated dark theme tokens
+        dark: {
+          bg: "#070E1A",
+          surface: "#0D192E",
+          card: "#11203A",
+          border: "#1E3456",
+          subtle: "#162744",
         },
       },
       fontFamily: {

@@ -42,7 +42,7 @@ export async function adminLogout(): Promise<{ success: boolean }> {
   return { success: true };
 }
 
-export async function adminCreateJob(formData: FormData): Promise<{ success: boolean; error?: string; job?: Job }> {
+export async function adminCreateJob(formData: FormData): Promise<{ success: boolean; error?: string; job?: Job; isPersisted?: boolean }> {
   const isAuth = await checkAdminAuth();
   if (!isAuth) {
     return { success: false, error: "Unauthorized access." };
@@ -91,7 +91,7 @@ export async function adminCreateJob(formData: FormData): Promise<{ success: boo
       isUrgent,
     });
 
-    return { success: true, job };
+    return { success: true, job, isPersisted: Boolean(job.isPersisted) };
   } catch (err: any) {
     return { success: false, error: err?.message || "Failed to create job." };
   }

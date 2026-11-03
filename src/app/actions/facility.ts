@@ -8,6 +8,7 @@ export interface FacilitySubmitResult {
   message?: string;
   inquiryId?: string;
   error?: string;
+  isPersisted?: boolean;
 }
 
 export async function handleFacilityInquirySubmit(
@@ -82,6 +83,7 @@ export async function handleFacilityInquirySubmit(
     return {
       success: true,
       inquiryId: savedInquiry.id,
+      isPersisted: Boolean(savedInquiry.isPersisted),
       message: "Thank you for reaching out to Ideal Healthcare Staffing. Your inquiry has been routed to our clinical client accounts team. A staffing coordinator will contact you to discuss coverage specifications.",
     };
   } catch (err) {

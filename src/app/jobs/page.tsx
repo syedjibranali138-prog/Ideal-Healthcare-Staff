@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getJobs } from "@/lib/db";
 import JobCard from "@/components/JobCard";
 import JobFilters from "@/components/JobFilters";
-import { Briefcase, SlidersHorizontal, AlertCircle, ArrowRight, ShieldCheck, Sparkles, PhoneCall } from "lucide-react";
+import { Briefcase, SlidersHorizontal, AlertCircle, ArrowRight, ShieldCheck, Sparkles, PhoneCall, Bell } from "lucide-react";
 import { COMPANY_INFO } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -41,52 +41,54 @@ export default async function JobsPage(props: JobsPageProps) {
   const { jobs, total } = await getJobs(filters);
 
   return (
-    <div className="bg-[#FCFCFB] min-h-screen py-10 sm:py-14">
+    <div className="bg-[#FCFCFB] dark:bg-[#070E1A] min-h-screen py-10 sm:py-14 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Breadcrumb & Title */}
         <div className="mb-8">
-          <nav className="text-xs text-slate-500 mb-3 flex items-center gap-1.5">
-            <Link href="/" className="hover:text-navy-950 transition-colors font-medium">Home</Link>
+          <nav className="text-xs text-slate-500 dark:text-slate-400 mb-3 flex items-center gap-1.5">
+            <Link href="/" className="hover:text-navy-950 dark:hover:text-white transition-colors font-medium">Home</Link>
             <span>/</span>
-            <span className="text-teal-700 font-bold">Clinical Jobs</span>
+            <span className="text-green-700 dark:text-green-400 font-bold">Clinical Jobs</span>
           </nav>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold mb-2">
-                <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-50 dark:bg-green-950/40 border border-green-200 dark:border-green-800/60 text-green-800 dark:text-green-300 text-xs font-bold mb-2">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
                 <span>Verified Hospital Orders Active</span>
               </div>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-950 tracking-tight font-display">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-navy-950 dark:text-white tracking-tight font-display">
                 Healthcare Job Opportunities
               </h1>
-              <p className="mt-2 text-sm sm:text-base text-slate-600 max-w-2xl font-normal">
+              <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl font-normal">
                 Explore verified travel nursing, therapy, allied health, and permanent clinical positions. Filter by specialty, state, and contract type.
               </p>
             </div>
 
-            <div className="text-xs text-slate-700 flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200/90 shadow-sm shrink-0 font-bold">
-              <ShieldCheck className="w-4 h-4 text-teal-600" />
-              <span>100% Verified Hospital Direct Orders</span>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="text-xs text-slate-700 dark:text-slate-200 flex items-center gap-2 bg-white dark:bg-dark-surface px-4 py-2 rounded-xl border border-slate-200/90 dark:border-dark-border shadow-sm shrink-0 font-bold">
+                <ShieldCheck className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <span>Verified Hospital Orders</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Interactive Search & Filter Bar */}
-        <Suspense fallback={<div className="h-28 bg-white rounded-2xl border border-slate-200 animate-pulse mb-8" />}>
+        <Suspense fallback={<div className="h-32 bg-white dark:bg-dark-surface rounded-2xl border border-slate-200 dark:border-dark-border animate-pulse mb-8" />}>
           <JobFilters />
         </Suspense>
 
         {/* Results Counter & Meta */}
-        <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-200/90">
-          <div className="text-sm font-bold text-navy-950">
-            Showing <span className="text-teal-700 font-black">{jobs.length}</span> {jobs.length === 1 ? "position" : "positions"}
+        <div className="flex items-center justify-between mb-6 pb-3 border-b border-slate-200/90 dark:border-dark-border">
+          <div className="text-sm font-bold text-navy-950 dark:text-white">
+            Showing <span className="text-green-700 dark:text-green-400 font-black">{jobs.length}</span> {jobs.length === 1 ? "position" : "positions"}
             {total > jobs.length && ` of ${total} total`}
           </div>
 
-          <div className="text-xs text-slate-500 hidden sm:block">
-            Sorted by: <span className="font-bold text-slate-900">{filters.sortBy === "pay" ? "Highest Compensation" : "Most Recent"}</span>
+          <div className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
+            Sorted by: <span className="font-bold text-slate-900 dark:text-slate-200">{filters.sortBy === "pay" ? "Highest Compensation" : "Most Recent"}</span>
           </div>
         </div>
 
@@ -98,14 +100,14 @@ export default async function JobsPage(props: JobsPageProps) {
             ))}
           </div>
         ) : (
-          <div className="bg-white border-2 border-slate-200/90 rounded-3xl p-12 text-center max-w-lg mx-auto shadow-sm my-8">
-            <div className="w-14 h-14 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white dark:bg-dark-surface border border-slate-200/90 dark:border-dark-border rounded-3xl p-12 text-center max-w-lg mx-auto shadow-sm my-8">
+            <div className="w-14 h-14 bg-slate-100 dark:bg-dark-card text-slate-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <AlertCircle className="w-7 h-7" />
             </div>
-            <h3 className="text-xl font-bold text-navy-950 mb-2 font-display">
+            <h3 className="text-xl font-bold text-navy-950 dark:text-white mb-2 font-display">
               No matching clinical jobs found
             </h3>
-            <p className="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">
               We couldn&apos;t find any positions matching your selected criteria. Try adjusting or resetting your specialty and location filters.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -117,7 +119,7 @@ export default async function JobsPage(props: JobsPageProps) {
               </Link>
               <Link
                 href="/facilities#inquiry-form"
-                className="btn-secondary text-xs font-bold px-6 py-3"
+                className="btn-secondary text-xs font-bold px-6 py-3 dark:bg-dark-card dark:border-dark-border dark:text-white"
               >
                 Inquire About Custom Placement
               </Link>
@@ -126,7 +128,7 @@ export default async function JobsPage(props: JobsPageProps) {
         )}
 
         {/* Candidate Support Banner */}
-        <div className="mt-16 bg-navy-950 text-white rounded-3xl p-8 sm:p-12 border-2 border-navy-800 shadow-xl relative overflow-hidden">
+        <div className="mt-16 bg-navy-950 dark:bg-dark-surface text-white rounded-3xl p-8 sm:p-12 border border-navy-800 dark:border-dark-border shadow-xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-80 h-80 bg-green-500/10 rounded-full blur-3xl pointer-events-none" />
           
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center relative z-10">
@@ -137,7 +139,7 @@ export default async function JobsPage(props: JobsPageProps) {
               <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight font-display">
                 Speak directly with an Ideal Healthcare recruitment specialist.
               </h2>
-              <p className="text-sm text-slate-300 leading-relaxed font-normal">
+              <p className="text-sm text-slate-300 dark:text-slate-300 leading-relaxed font-normal">
                 Our clinical placement coordinators maintain direct access to unadvertised hospital requests, rapid response units, and upcoming contract blocks across leading medical networks.
               </p>
             </div>

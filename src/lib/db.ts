@@ -298,37 +298,46 @@ export async function createJob(jobData: Omit<Job, "id" | "createdAt" | "updated
     id: `job-${Date.now()}`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    isPersisted: false,
   };
 
   if (isSupabaseAdminConfigured()) {
     const adminClient = getSupabaseAdmin();
     if (adminClient) {
-      const { data, error } = await adminClient.from("jobs").insert({
-        slug: newJob.slug,
-        title: newJob.title,
-        department: newJob.department,
-        specialty: newJob.specialty,
-        location_city: newJob.locationCity,
-        location_state: newJob.locationState,
-        employment_type: newJob.employmentType,
-        shift: newJob.shift,
-        duration_weeks: newJob.durationWeeks,
-        pay_range: newJob.payRange,
-        description: newJob.description,
-        responsibilities: newJob.responsibilities,
-        qualifications: newJob.qualifications,
-        benefits: newJob.benefits,
-        status: newJob.status,
-        is_urgent: newJob.isUrgent,
-      }).select().single();
+      try {
+        const { data, error } = await adminClient.from("jobs").insert({
+          slug: newJob.slug,
+          title: newJob.title,
+          department: newJob.department,
+          specialty: newJob.specialty,
+          location_city: newJob.locationCity,
+          location_state: newJob.locationState,
+          employment_type: newJob.employmentType,
+          shift: newJob.shift,
+          duration_weeks: newJob.durationWeeks,
+          pay_range: newJob.payRange,
+          description: newJob.description,
+          responsibilities: newJob.responsibilities,
+          qualifications: newJob.qualifications,
+          benefits: newJob.benefits,
+          status: newJob.status,
+          is_urgent: newJob.isUrgent,
+        }).select().single();
 
-      if (!error && data) {
-        return {
-          ...newJob,
-          id: data.id,
-          createdAt: data.created_at,
-          updatedAt: data.updated_at,
-        };
+        if (!error && data) {
+          return {
+            ...newJob,
+            id: data.id,
+            createdAt: data.created_at,
+            updatedAt: data.updated_at,
+            isPersisted: true,
+          };
+        }
+        if (error) {
+          console.error("Supabase admin createJob error:", error);
+        }
+      } catch (err) {
+        console.error("Supabase admin createJob exception:", err);
       }
     }
   }
@@ -341,34 +350,42 @@ export async function updateJobStatus(id: string, status: Job["status"]): Promis
   if (isSupabaseAdminConfigured()) {
     const adminClient = getSupabaseAdmin();
     if (adminClient) {
-      const { data, error } = await adminClient
-        .from("jobs")
-        .update({ status, updated_at: new Date().toISOString() })
-        .eq("id", id)
-        .select()
-        .single();
-      if (!error && data) {
-        return {
-          id: data.id,
-          slug: data.slug,
-          title: data.title,
-          department: data.department,
-          specialty: data.specialty,
-          locationCity: data.location_city,
-          locationState: data.location_state,
-          employmentType: data.employment_type,
-          shift: data.shift,
-          durationWeeks: data.duration_weeks,
-          payRange: data.pay_range,
-          description: data.description,
-          responsibilities: data.responsibilities || [],
-          qualifications: data.qualifications || [],
-          benefits: data.benefits || [],
-          status: data.status,
-          isUrgent: data.is_urgent,
-          createdAt: data.created_at,
-          updatedAt: data.updated_at,
-        };
+      try {
+        const { data, error } = await adminClient
+          .from("jobs")
+          .update({ status, updated_at: new Date().toISOString() })
+          .eq("id", id)
+          .select()
+          .single();
+        if (!error && data) {
+          return {
+            id: data.id,
+            slug: data.slug,
+            title: data.title,
+            department: data.department,
+            specialty: data.specialty,
+            locationCity: data.location_city,
+            locationState: data.location_state,
+            employmentType: data.employment_type,
+            shift: data.shift,
+            durationWeeks: data.duration_weeks,
+            payRange: data.pay_range,
+            description: data.description,
+            responsibilities: data.responsibilities || [],
+            qualifications: data.qualifications || [],
+            benefits: data.benefits || [],
+            status: data.status,
+            isUrgent: data.is_urgent,
+            createdAt: data.created_at,
+            updatedAt: data.updated_at,
+            isPersisted: true,
+          };
+        }
+        if (error) {
+          console.error("Supabase admin updateJobStatus error:", error);
+        }
+      } catch (err) {
+        console.error("Supabase admin updateJobStatus exception:", err);
       }
     }
   }
@@ -377,7 +394,7 @@ export async function updateJobStatus(id: string, status: Job["status"]): Promis
   if (job) {
     job.status = status;
     job.updatedAt = new Date().toISOString();
-    return job;
+    return { ...job, isPersisted: false };
   }
   return null;
 }
@@ -395,40 +412,73 @@ export async function submitApplication(
     status: "new",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    isPersisted: false,
   };
 
-  if (isSupabaseConfigured() && supabase) {
-    try {
-      const isUuid = Boolean(data.jobId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.jobId));
-      const { data: dbData, error } = await supabase.from("applications").insert({
-        job_id: isUuid ? data.jobId : null,
-        job_title: data.jobTitle,
-        full_name: data.fullName,
-        email: data.email,
-        phone: data.phone,
-        specialty: data.specialty,
-        years_of_experience: data.yearsOfExperience,
-        primary_license_state: data.primaryLicenseState,
-        resume_url: data.resumeUrl,
-        resume_filename: data.resumeFilename,
-        cover_note: data.coverNote,
-        consent_given: data.consentGiven,
-        status: "new",
-      }).select().single();
+  const isUuid = Boolean(data.jobId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data.jobId));
+  const recordPayload = {
+    job_id: isUuid ? data.jobId : null,
+    job_title: data.jobTitle,
+    full_name: data.fullName,
+    email: data.email,
+    phone: data.phone,
+    specialty: data.specialty,
+    years_of_experience: data.yearsOfExperience,
+    primary_license_state: data.primaryLicenseState || null,
+    resume_url: data.resumeUrl || null,
+    resume_filename: data.resumeFilename || null,
+    cover_note: data.coverNote || null,
+    consent_given: data.consentGiven,
+    status: "new" as const,
+  };
 
-      if (!error && dbData) {
+  // Secure server-side insertion: use admin client if configured to bypass RLS SELECT restriction on RETURNING clause
+  if (isSupabaseAdminConfigured()) {
+    const adminClient = getSupabaseAdmin();
+    if (adminClient) {
+      try {
+        const { data: dbData, error } = await adminClient
+          .from("applications")
+          .insert(recordPayload)
+          .select()
+          .single();
+
+        if (!error && dbData) {
+          return {
+            ...newApp,
+            id: dbData.id,
+            createdAt: dbData.created_at,
+            updatedAt: dbData.updated_at,
+            isPersisted: true,
+          };
+        }
+        if (error) {
+          console.warn("Supabase admin application insert error:", error);
+        }
+      } catch (e) {
+        console.warn("Error inserting application to Supabase via admin client:", e);
+      }
+    }
+  } else if (isSupabaseConfigured() && supabase) {
+    // If only public anon client is configured, insert WITHOUT .select() to prevent RLS returning policy violation
+    try {
+      const { error } = await supabase.from("applications").insert(recordPayload);
+
+      if (!error) {
         return {
           ...newApp,
-          id: dbData.id,
-          createdAt: dbData.created_at,
-          updatedAt: dbData.updated_at,
+          isPersisted: true,
         };
       }
+      if (error) {
+        console.warn("Supabase anon application insert error:", error);
+      }
     } catch (e) {
-      console.warn("Error inserting application to Supabase, saving locally:", e);
+      console.warn("Error inserting application to Supabase via anon client:", e);
     }
   }
 
+  // Resilient fallback for unconfigured environments
   fallbackApplications.unshift(newApp);
   return newApp;
 }
@@ -536,35 +586,67 @@ export async function submitFacilityInquiry(
     status: "new",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    isPersisted: false,
   };
 
-  if (isSupabaseConfigured() && supabase) {
-    try {
-      const { data: dbData, error } = await supabase.from("facility_inquiries").insert({
-        facility_name: data.facilityName,
-        contact_name: data.contactName,
-        contact_title: data.contactTitle,
-        email: data.email,
-        phone: data.phone,
-        city: data.city,
-        state: data.state,
-        facility_type: data.facilityType,
-        staffing_needs: data.staffingNeeds,
-        urgency: data.urgency,
-        details: data.details,
-        status: "new",
-      }).select().single();
+  const recordPayload = {
+    facility_name: data.facilityName,
+    contact_name: data.contactName,
+    contact_title: data.contactTitle || null,
+    email: data.email,
+    phone: data.phone,
+    city: data.city,
+    state: data.state,
+    facility_type: data.facilityType,
+    staffing_needs: data.staffingNeeds,
+    urgency: data.urgency,
+    details: data.details || null,
+    status: "new" as const,
+  };
 
-      if (!error && dbData) {
+  // Secure server-side insertion: use admin client if configured to bypass RLS SELECT restriction on RETURNING clause
+  if (isSupabaseAdminConfigured()) {
+    const adminClient = getSupabaseAdmin();
+    if (adminClient) {
+      try {
+        const { data: dbData, error } = await adminClient
+          .from("facility_inquiries")
+          .insert(recordPayload)
+          .select()
+          .single();
+
+        if (!error && dbData) {
+          return {
+            ...newInq,
+            id: dbData.id,
+            createdAt: dbData.created_at,
+            updatedAt: dbData.updated_at,
+            isPersisted: true,
+          };
+        }
+        if (error) {
+          console.warn("Supabase admin facility inquiry insert error:", error);
+        }
+      } catch (e) {
+        console.warn("Error inserting facility inquiry to Supabase via admin client:", e);
+      }
+    }
+  } else if (isSupabaseConfigured() && supabase) {
+    // If only public anon client is configured, insert WITHOUT .select() to prevent RLS returning policy violation
+    try {
+      const { error } = await supabase.from("facility_inquiries").insert(recordPayload);
+
+      if (!error) {
         return {
           ...newInq,
-          id: dbData.id,
-          createdAt: dbData.created_at,
-          updatedAt: dbData.updated_at,
+          isPersisted: true,
         };
       }
+      if (error) {
+        console.warn("Supabase anon facility inquiry insert error:", error);
+      }
     } catch (e) {
-      console.warn("Error inserting facility inquiry to Supabase:", e);
+      console.warn("Error inserting facility inquiry to Supabase via anon client:", e);
     }
   }
 
@@ -669,9 +751,9 @@ export async function subscribeJobAlert(
   specialty?: string,
   state?: string,
   employmentType?: string
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string; isPersisted?: boolean }> {
   if (!email || !email.includes("@")) {
-    return { success: false, message: "A valid email address is required." };
+    return { success: false, message: "A valid email address is required.", isPersisted: false };
   }
 
   const newAlert: JobAlert = {
@@ -682,10 +764,30 @@ export async function subscribeJobAlert(
     employmentType,
     isActive: true,
     unsubscribeToken: Math.random().toString(36).substring(2, 15),
+    isPersisted: false,
     createdAt: new Date().toISOString(),
   };
 
-  if (isSupabaseConfigured() && supabase) {
+  let isPersisted = false;
+
+  if (isSupabaseAdminConfigured()) {
+    const adminClient = getSupabaseAdmin();
+    if (adminClient) {
+      try {
+        const { error } = await adminClient.from("job_alerts").insert({
+          email,
+          specialty,
+          state,
+          employment_type: employmentType,
+          is_active: true,
+        });
+        if (!error) isPersisted = true;
+        else console.warn("Supabase admin alert insert error:", error);
+      } catch (e) {
+        console.warn("Supabase admin alert exception:", e);
+      }
+    }
+  } else if (isSupabaseConfigured() && supabase) {
     try {
       const { error } = await supabase.from("job_alerts").insert({
         email,
@@ -694,17 +796,85 @@ export async function subscribeJobAlert(
         employment_type: employmentType,
         is_active: true,
       });
-      if (error) {
-        console.warn("Supabase alert insert error:", error);
-      }
+      if (!error) isPersisted = true;
+      else console.warn("Supabase anon alert insert error:", error);
     } catch (e) {
-      console.warn("Supabase alert exception:", e);
+      console.warn("Supabase anon alert exception:", e);
     }
   }
 
+  newAlert.isPersisted = isPersisted;
   fallbackJobAlerts.push(newAlert);
   return {
     success: true,
+    isPersisted,
     message: "Thank you for subscribing. You will receive notifications when matching opportunities become available.",
   };
+}
+
+// ====================================================================
+// DATA LAYER STATUS PROBE
+// ====================================================================
+
+export interface DataLayerStatus {
+  isConfigured: boolean;
+  isAdminConfigured: boolean;
+  mode: "database" | "fallback" | "error";
+  message: string;
+  details?: string;
+}
+
+export async function getDataLayerStatus(): Promise<DataLayerStatus> {
+  if (!isSupabaseConfigured()) {
+    return {
+      isConfigured: false,
+      isAdminConfigured: false,
+      mode: "fallback",
+      message: "In-Memory Fallback Mode",
+      details: "Supabase unconfigured • Data transient in RAM",
+    };
+  }
+
+  try {
+    const client = isSupabaseAdminConfigured() ? getSupabaseAdmin() : supabase;
+    if (!client) {
+      return {
+        isConfigured: true,
+        isAdminConfigured: false,
+        mode: "fallback",
+        message: "Client Init Failed",
+        details: "Falling back to in-memory dataset.",
+      };
+    }
+
+    // Safe, non-destructive check against the jobs table
+    const { error } = await client.from("jobs").select("id", { count: "exact", head: true });
+    if (error) {
+      return {
+        isConfigured: true,
+        isAdminConfigured: isSupabaseAdminConfigured(),
+        mode: "error",
+        message: "Database Error",
+        details: error.message || "Table check failed. Ensure schema migrations were executed in Supabase SQL editor.",
+      };
+    }
+
+    return {
+      isConfigured: true,
+      isAdminConfigured: isSupabaseAdminConfigured(),
+      mode: "database",
+      message: "Supabase Connected",
+      details: isSupabaseAdminConfigured()
+        ? "PostgreSQL database & service-role storage active."
+        : "PostgreSQL public anon connection active.",
+    };
+  } catch (err: any) {
+    return {
+      isConfigured: true,
+      isAdminConfigured: isSupabaseAdminConfigured(),
+      mode: "error",
+      message: "Connection Error",
+      details: err?.message || "Failed to reach Supabase endpoint.",
+    };
+  }
 }
