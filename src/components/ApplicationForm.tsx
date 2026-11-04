@@ -20,7 +20,7 @@ export default function ApplicationForm({
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [successData, setSuccessData] = useState<{ id: string; message: string } | null>(null);
+  const [successData, setSuccessData] = useState<{ id: string; message: string; isPersisted?: boolean } | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -78,6 +78,7 @@ export default function ApplicationForm({
       setSuccessData({
         id: res.applicationId || "IHS-APP",
         message: res.message || "Application received.",
+        isPersisted: res.isPersisted,
       });
     }
   };
@@ -92,7 +93,9 @@ export default function ApplicationForm({
           Application Received
         </h3>
         <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-6">
-          Thank you for applying. Your application has been logged into our secure clinical recruitment database. A dedicated clinical recruiter will review your credentials and contact you directly.
+          {successData.isPersisted
+            ? "Thank you for applying. Your application has been securely recorded in our clinical database. A dedicated clinical recruiter will review your credentials and contact you directly."
+            : "Thank you for applying. Your application has been received and routed to our clinical recruitment team. A dedicated clinical recruiter will review your credentials and contact you directly."}
         </p>
         <div className="bg-slate-50 dark:bg-dark-card border border-slate-200 dark:border-dark-border px-4 py-2.5 rounded-xl text-xs font-mono text-slate-700 dark:text-slate-300 mb-8 inline-block">
           Candidate Application ID: <span className="font-bold text-navy-950 dark:text-white">{successData.id}</span>
