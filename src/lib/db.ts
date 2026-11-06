@@ -1,4 +1,15 @@
-import { Job, Application, FacilityInquiry, JobAlert, JobFiltersState, ApplicationStatus, FacilityInquiryStatus } from "@/types";
+import {
+  Job,
+  Application,
+  FacilityInquiry,
+  JobAlert,
+  JobFiltersState,
+  ApplicationStatus,
+  FacilityInquiryStatus,
+  StaffUser,
+  StaffPermissions,
+  AdminRole
+} from "@/types";
 import { INITIAL_JOBS } from "./constants";
 import { supabase, getSupabaseAdmin, isSupabaseConfigured, isSupabaseAdminConfigured } from "./supabase";
 
@@ -877,4 +888,182 @@ export async function getDataLayerStatus(): Promise<DataLayerStatus> {
       details: err?.message || "Failed to reach Supabase endpoint.",
     };
   }
+}
+
+// ====================================================================
+// STAFF USERS & PERMISSIONS STORE
+// ====================================================================
+
+export const DEFAULT_STAFF_PERMISSIONS: StaffPermissions = {
+  dashboard: true,
+  jobs: { view: true, create: false, edit: false, delete: false },
+  applications: { view: true, edit: true, delete: false },
+  facilities: { view: true, edit: false, delete: false },
+};
+
+let fallbackStaffUsers: StaffUser[] = [];
+
+export async function getStaffUsers(): Promise<StaffUser[]> {
+  if (isSupabaseAdminConfigured()) {
+    const adminClient = getSupabaseAdmin();
+    if (adminClient) {
+      try {
+        const { data, error } = await adminClient
+          .from("staff_users")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (!error && data && data.length > 0) {
+          return data.map((d: any) => ({
+            id: d.id,
+            name: d.name,
+            email: d.email,
+            password: d.password,
+            role: d.role as AdminRole,
+            isActive: d.is_active ?? true,
+            permissions: d.permissions as StaffPermissions,
+            createdAt: d.created_at,
+            updatedAt: d.updated_at,
+          }));
+        }
+      } catch (e) {
+        // Fall back to in-memory store
+      }
+    }
+  }
+
+  return [...fallbackStaffUsers].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+}
+
+export async function getStaffUserById(id: string): Promise<StaffUser | null> {
+  const all = await getStaffUsers();
+  return all.find(s => s.id === id) || null;
+}
+
+export async function getStaffUserByEmail(email: string): Promise<StaffUser | null> {
+  const normEmail = email.trim().toLowerCase();
+  const all = await getStaffUsers();
+  return all.find(s => s.email.trim().toLowerCase() === normEmail) || null;
+}
+
+export async function createStaffUser(
+  data: Omit<StaffUser, "id" | "createdAt" | "updatedAt">
+): Promise<StaffUser> {
+  const newUser: StaffUser = {
+    id: `staff-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+    name: data.name.trim(),
+    email: data.email.trim().toLowerCase(),
+    password: data.password || "",
+    role: data.role || "staff_admin",
+    isActive: data.isActive ?? true,
+    permissions: data.permissions || DEFAULT_STAFF_PERMISSIONS,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (isSupabaseAdminConfigured()) {
+    const adminClient = getSupabaseAdmin();
+    if (adminClient) {
+      try {
+        const { data: dbData, error } = await adminClient
+          .from("staff_users")
+          .insert({
+            name: newUser.name,
+            email: newUser.email,
+            password: newUser.password,
+            role: newUser.role,
+            is_active: newUser.isActive,
+            permissions: newUser.permissions,
+          })
+          .select()
+          .single();
+
+        if (!error && dbData) {
+          newUser.id = dbData.id;
+        }
+      } catch (e) {
+        // Ignore and save in-memory
+      }
+    }
+  }
+
+  // Also maintain in fallback cache
+  fallbackStaffUsers = [newUser, ...fallbackStaffUsers];
+  return newUser;
+}
+
+export async function updateStaffUser(
+  id: string,
+  updates: Partial<StaffUser>
+): Promise<StaffUser | null> {
+  const idx = fallbackStaffUsers.findIndex(s => s.id === id);
+
+  if (isSupabaseAdminConfigured()) {
+    const adminClient = getSupabaseAdmin();
+    if (adminClient) {
+      try {
+        const updatePayload: Record<string, any> = {
+          updated_at: new Date().toISOString(),
+        };
+        if (updates.name !== undefined) updatePayload.name = updates.name;
+        if (updates.email !== undefined) updatePayload.email = updates.email.toLowerCase();
+        if (updates.password !== undefined) updatePayload.password = updates.password;
+        if (updates.role !== undefined) updatePayload.role = updates.role;
+        if (updates.isActive !== undefined) updatePayload.is_active = updates.isActive;
+        if (updates.permissions !== undefined) updatePayload.permissions = updates.permissions;
+
+        const { data: dbData, error } = await adminClient
+          .from("staff_users")
+          .update(updatePayload)
+          .eq("id", id)
+          .select()
+          .single();
+
+        if (!error && dbData) {
+          const updated: StaffUser = {
+            id: dbData.id,
+            name: dbData.name,
+            email: dbData.email,
+            password: dbData.password,
+            role: dbData.role,
+            isActive: dbData.is_active,
+            permissions: dbData.permissions,
+            createdAt: dbData.created_at,
+            updatedAt: dbData.updated_at,
+          };
+          if (idx !== -1) fallbackStaffUsers[idx] = updated;
+          return updated;
+        }
+      } catch (e) {
+        // Fall back to in-memory
+      }
+    }
+  }
+
+  if (idx === -1) return null;
+  const updated: StaffUser = {
+    ...fallbackStaffUsers[idx],
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  };
+  fallbackStaffUsers[idx] = updated;
+  return updated;
+}
+
+export async function deleteStaffUser(id: string): Promise<boolean> {
+  if (isSupabaseAdminConfigured()) {
+    const adminClient = getSupabaseAdmin();
+    if (adminClient) {
+      try {
+        await adminClient.from("staff_users").delete().eq("id", id);
+      } catch (e) {
+        // Fall back
+      }
+    }
+  }
+
+  fallbackStaffUsers = fallbackStaffUsers.filter(s => s.id !== id);
+  return true;
 }

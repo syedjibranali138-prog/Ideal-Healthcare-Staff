@@ -1,11 +1,11 @@
-export type JobDepartment = 
+export type JobDepartment =
   | 'Nursing'
   | 'Allied Health'
   | 'Therapy'
   | 'Advanced Practice'
   | 'Healthcare Administration';
 
-export type EmploymentType = 
+export type EmploymentType =
   | 'Travel Contract'
   | 'Per Diem'
   | 'Permanent / Direct Hire'
@@ -36,7 +36,7 @@ export interface Job {
   updatedAt: string;
 }
 
-export type ApplicationStatus = 
+export type ApplicationStatus =
   | 'new'
   | 'reviewed'
   | 'contacted'
@@ -65,7 +65,7 @@ export interface Application {
   updatedAt: string;
 }
 
-export type FacilityInquiryStatus = 
+export type FacilityInquiryStatus =
   | 'new'
   | 'contacted'
   | 'in_discussion'
@@ -112,4 +112,50 @@ export interface JobFiltersState {
   state: string;
   employmentType: string;
   sortBy: 'newest' | 'pay';
+}
+
+// ====================================================================
+// ADMIN ROLES & STAFF PERMISSIONS
+// ====================================================================
+
+export type AdminRole = "super_admin" | "staff_admin";
+
+export interface StaffPermissions {
+  dashboard: boolean;
+  jobs: {
+    view: boolean;
+    create: boolean;
+    edit: boolean;
+    delete: boolean;
+  };
+  applications: {
+    view: boolean;
+    edit: boolean;
+    delete: boolean;
+  };
+  facilities: {
+    view: boolean;
+    edit: boolean;
+    delete: boolean;
+  };
+}
+
+export interface StaffUser {
+  id: string;
+  name: string;
+  email: string;
+  password?: string;
+  role: AdminRole;
+  isActive: boolean;
+  permissions: StaffPermissions;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminSession {
+  role: AdminRole;
+  email?: string;
+  name?: string;
+  staffId?: string;
+  permissions: StaffPermissions;
 }

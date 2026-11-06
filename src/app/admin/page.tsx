@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { checkAdminAuth } from "@/app/actions/admin";
-import { getAllJobsAdmin, getApplications, getFacilityInquiries, getDataLayerStatus } from "@/lib/db";
+import { getAdminSession } from "@/app/actions/admin";
+import { getAllJobsAdmin, getApplications, getFacilityInquiries, getDataLayerStatus, getStaffUsers } from "@/lib/db";
 import AdminDashboardClient from "./AdminDashboardClient";
 import AdminLoginForm from "./AdminLoginForm";
 
@@ -15,24 +15,27 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const isAuth = await checkAdminAuth();
+  const session = await getAdminSession();
 
-  if (!isAuth) {
+  if (!session) {
     return <AdminLoginForm />;
   }
 
-  const [jobs, applications, inquiries, dataLayerStatus] = await Promise.all([
+  const [jobs, applications, inquiries, dataLayerStatus, staffUsers] = await Promise.all([
     getAllJobsAdmin(),
     getApplications(),
     getFacilityInquiries(),
     getDataLayerStatus(),
+    session.role === "super_admin" ? getStaffUsers() : Promise.resolve([]),
   ]);
 
   return (
     <AdminDashboardClient
+      session={session}
       initialJobs={jobs}
       initialApplications={applications}
       initialInquiries={inquiries}
+      initialStaffUsers={staffUsers}
       dataLayerStatus={dataLayerStatus}
     />
   );
