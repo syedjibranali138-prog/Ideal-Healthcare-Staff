@@ -28,7 +28,34 @@ import {
 
 const ADMIN_COOKIE_NAME = "ihs_admin_session";
 const isProduction = process.env.NODE_ENV === "production";
-const EXPECTED_PASSWORD = process.env.ADMIN_PASSWORD || (!isProduction ? "ideal2025!" : undefined);
+function cleanEnvValue(val?: string): string | undefined {
+  if (!val) return undefined;
+  let trimmed = val.trim();
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    trimmed = trimmed.slice(1, -1).trim();
+  }
+  return trimmed || undefined;
+}
+
+function getExpectedAdminPassword(): string | undefined {
+  const isProd = process.env.NODE_ENV === "production";
+  const pass =
+    cleanEnvValue(process.env.ADMIN_PASSWORD) ||
+    cleanEnvValue(process.env.ADMIN_PASS) ||
+    cleanEnvValue(process.env.SUPER_ADMIN_PASSWORD) ||
+    cleanEnvValue(process.env.ADMIN_SECRET);
+
+  if (pass) return pass;
+
+  if (!isProd) {
+    return "ideal2025!";
+  }
+
+  return undefined;
+}
 
 const SUPER_ADMIN_PERMISSIONS: StaffPermissions = {
   dashboard: true,
@@ -84,6 +111,22 @@ export async function adminLogin(
   const cleanEmail = email?.trim().toLowerCase();
   const cleanPass = password?.trim();
 
+  const expectedPassword = getExpectedAdminPassword();
+
+  // Safe server-side diagnostic logging (checks existence without printing secret)
+  console.log("[AdminAuth Diagnostic]", {
+    timestamp: new Date().toISOString(),
+    hasAdminPassword: Boolean(process.env.ADMIN_PASSWORD),
+    adminPasswordLen: process.env.ADMIN_PASSWORD ? process.env.ADMIN_PASSWORD.length : 0,
+    hasAdminPassAlias: Boolean(process.env.ADMIN_PASS),
+    hasSuperAdminPassAlias: Boolean(process.env.SUPER_ADMIN_PASSWORD),
+    expectedPasswordResolved: Boolean(expectedPassword),
+    nodeEnv: process.env.NODE_ENV,
+    vercelEnv: process.env.VERCEL_ENV,
+    hasEmailInput: Boolean(cleanEmail),
+    hasPasswordInput: Boolean(cleanPass),
+  });
+
   if (!cleanPass) {
     return { success: false, error: "Password or passcode is required." };
   }
@@ -98,14 +141,14 @@ export async function adminLogin(
 
   // 1. Super Admin Passcode Check
   if (!cleanEmail || cleanEmail === "admin" || cleanEmail.includes("admin@")) {
-    if (!EXPECTED_PASSWORD) {
+    if (!expectedPassword) {
       return {
         success: false,
         error: "Super Admin password is not configured on this server. Set the ADMIN_PASSWORD environment variable in your production hosting settings."
       };
     }
 
-    if (cleanPass === EXPECTED_PASSWORD) {
+    if (cleanPass === expectedPassword) {
       const superSession: AdminSession = {
         role: "super_admin",
         name: "Super Administrator",
